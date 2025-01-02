@@ -82,11 +82,3 @@ For example:
 ```bash
 python inference.py --dir ./datasets/csv/inference.csv --n 100 --model_path ./trained/first.pkl --model_name dt
 ```
-
-## Sidenote:
-- The malware are real! Please care to not accidentally run any of the malware. You should have an antivirus on, but do not delete the file, make the antivirus stop you when execute any of that malware.
-- If you don't sure which file is malware or not, drop the file on VirusTotal website.
-- When inputing any files to test for the data, beware of many exception that depend on your own computer, for example "Access denied". We have catch every exception that we found, but maybe there can be some uncatched one. In that case, just test on others files, best be your own files and not the system's
-- When reading many of the notebook, you may catch glimpse of some data related to multiclass classification. We have tried to do that, but as the data and result are grim, we decide to stop doing multiclass classification. There may be some unremoved note on that, please ignore it.
-
-
