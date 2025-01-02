@@ -38,25 +38,25 @@ def main(path,model,file_name,valid_file):
     X = vt.transform(X)
     if model == "dt":
         X = std.transform(X)
-        model = DecisionTreeClassifier()
+        cls = DecisionTreeClassifier()
     elif model == "gnb":
         X = std.transform(X)
-        model = GaussianNB()
+        cls = GaussianNB()
     elif model == "lr":
         X = std.transform(X)
-        model = LogisticRegression()
+        cls = LogisticRegression()
     elif model == "lgbm":
         X = std.transform(X)
-        model = LGBMClassifier(verbosity=-1)
+        cls = LGBMClassifier(verbosity=-1)
     elif model == "mnb":    
         X = discretizer.transform(X)
-        model = MultinomialNB()
+        cls = MultinomialNB()
     elif model == "mymnb":
         X = discretizer.transform(X)
-        model = MyMNB()
+        cls = MyMNB()
     elif model == "mygnb":
         X = std.transform(X)
-        model = MyGNB()
+        cls = MyGNB()
     else:
         print("Please choose a correct model")
         return
@@ -92,9 +92,9 @@ def main(path,model,file_name,valid_file):
         elif model == "mygnb":
             X_valid = std.transform(X_valid)
     try:
-        model.fit(X_train,y_train)
-        y_pred = model.predict(X_valid)
-        y_score = model.predict_proba(X_valid)[:,1]
+        cls.fit(X_train,y_train)
+        y_pred = cls.predict(X_valid)
+        y_score = cls.predict_proba(X_valid)[:,1]
     except Exception as e:        
         print("Data error")
         print(e)
@@ -102,7 +102,7 @@ def main(path,model,file_name,valid_file):
     print_metrics(name,y_valid,y_pred,y_score)
     
     with open(f"trained/{file_name}.pkl","wb") as f:
-        pickle.dump(model,f)
+        pickle.dump(cls,f)
     
     print(f"Model saved at trained/{file_name}.pkl")
     
