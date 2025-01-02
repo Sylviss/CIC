@@ -9,33 +9,80 @@ This project assumes Python 3 was used. Used package:
 - lightgbm
 ## Installation guide:
 - Install the source code and extract to a folder
-- Install the dataset from the source [here](https://example.com/dataset)
+- Install the dataset from the source [here](https://www.kaggle.com/datasets/nguyenhoangsontung/cic-ids-self-collections)
 - Open CMD in the main folder, which should be the malware-detection folder. Your current location should look like this:
 ```bash
 C:\abcxyz\...\CIC>
 ```
-## Running guide:
-- For the UI version: run the command:
-```bash
-python src/ui.py
-```
-After that, the UI should look like this:
-![alt text](readmeImage/image.png)
-Choose a model to run in the middle part, and then choose one of the two type: a single file or directories. After that, any relevant data should be print out in the UI. For example:
-![alt text](readmeImage/image234.png)
-- For the ipynb verion: run the notebook run-model, located in src. The instruction are saved there, please read and follow it.
 ## Folder structure:
 - Datasets: contains the dataset:
-    + CLaMP_Raw: the unprocessed dataset
-    + CLaMP_Integrated: the processed dataset
-    + CLaMP_In_Selected: the processed dataset, after applying feature selection. This was used to train/test/validate the models.
-- old: old files
+- models: contains the pre-trained models and also the tools for data preprocessing
+- trained: contains your model after training
 - src:
-    + images: many images contains experiments on the models,mostly consist of graph when doing validating models
-    + models: the saved models in joblib or pickle form
-    + notebooks: mostly consist of notebooks that we used to test the models. The result are saved there to save time for the users. Also contains some .py file of neural networks, that are used to help with loading models.
-    + self: many notebook/files for testing, mostly redundant for checking.
-    + tools: the tools that are used, mostly for converting input from raw file and process the dataset.
+    + inference_test.ipynb: notebook related to experiment
+    + preprocess.ipynb: notebook related to data preprocessing
+    + training_cont.ipynb & training_discrete.ipynb: notebooks related to training phase
+    + NaiveBayes.py: python module contains the implementation of Naive Bayes
+    + train_new.py: cls python files to train new models
+    + test.py: cls python files to test models
+    + inference.py: cls python files to inference from the data
+## Running guide:
+- To train a new model, please run:
+
+
+```bash
+python train_new.py 
+```
+
+
+The parameter for the cls are:
+    + --path: the file path of the train dataset
+    + --valid_path: the file path of the valid dataset(optional)
+    + --file_name: the name of the model to be saved
+    + --model: the model type to be used
+
+
+For example:
+```bash
+python train_new.py --path ./datasets/csv/train.csv --valid_path ./datasets/csv/test.csv --file_name first --model dt
+```
+
+- To test a model, please run:
+```bash
+python test.py 
+```
+
+
+The parameter for the cls are:
+    + --path: the file path of the test dataset
+    + --model_path: the file path of the trained model
+    + --model_name: the name of the model to be used
+
+
+For example:
+```bash
+python test.py --path ./datasets/csv/test.csv --model_path ./trained/first.pkl --model_name dt
+```
+
+
+- To test a model, please run:
+```bash
+python inference.py 
+```
+
+
+The parameter for the cls are:
+    + --dir: the directory path of the inference dataset
+    + --n: the number of samples to show
+    + --model_path: the file path of the trained model
+    + --model_name: the name of the model to be used
+
+
+For example:
+```bash
+python inference.py --dir ./datasets/csv/inference.csv --n 100 --model_path ./trained/first.pkl --model_name dt
+```
+
 ## Sidenote:
 - The malware are real! Please care to not accidentally run any of the malware. You should have an antivirus on, but do not delete the file, make the antivirus stop you when execute any of that malware.
 - If you don't sure which file is malware or not, drop the file on VirusTotal website.
