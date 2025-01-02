@@ -36,10 +36,10 @@ python train_new.py
 
 
 The parameter for the cls are:
-    + --path: the file path of the train dataset
-    + --valid_path: the file path of the valid dataset(optional)
-    + --file_name: the name of the model to be saved
-    + --model: the model type to be used
+- --path: the file path of the train dataset
+- --valid_path: the file path of the valid dataset(optional)
+- --file_name: the name of the model to be saved
+- --model: the model type to be used
 
 
 For example:
@@ -54,9 +54,9 @@ python test.py
 
 
 The parameter for the cls are:
-    + --path: the file path of the test dataset
-    + --model_path: the file path of the trained model
-    + --model_name: the name of the model to be used
+- --path: the file path of the test dataset
+- --model_path: the file path of the trained model
+- --model_name: the name of the model to be used
 
 
 For example:
@@ -72,10 +72,10 @@ python inference.py
 
 
 The parameter for the cls are:
-    + --dir: the directory path of the inference dataset
-    + --n: the number of samples to show
-    + --model_path: the file path of the trained model
-    + --model_name: the name of the model to be used
+- --dir: the directory path of the inference dataset
+- --n: the number of samples to show
+- --model_path: the file path of the trained model
+- --model_name: the name of the model to be used
 
 
 For example:
