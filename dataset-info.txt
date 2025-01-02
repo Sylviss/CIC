@@ -1,0 +1,25 @@
+sdn intrusion are for testing only
+dataset size:
+usb-ids: 4m5 malicious,300k benign
+sdn intrusion: 800k benign,400k malicious
+ddos dataset: 12m balanced
+cic-bot-iot: 6m malicious,12k benign
+cic-ids-collection: 6m benign,2m malicious
+cic-ton-iot: 5m balanced
+cupid: 1m2 benign,170k mailicious
+tii-ssrc-23: 6m malicious only
+
+the dataset is cleaned by removing nan,inf.
+total: 26m720 malicious, 15m990 benign
+
+split 20% testing, 70% training, 10% valid for each dataset
+
+all traning part are concat and then balanced. the validation are also done the same.
+the testing is tested both balanced and unbalanced.
+
+the final dataset:
++ Each dataset is splitted inside their own folder. They are splitted into testing, training and validation
++ The training part then are sampled
++ All of the training part in each folder are then concatenated inside the final folder. Same with validation
++ The testing is held inside each folder, and each test is done both balanced and unbalanced
++ The csv folder contains data for CLI example: a traing csv file, a testing csv file, a base csv file for getting more data, and an inference csv file for inferencing unknown data.

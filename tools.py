@@ -50,10 +50,21 @@ def prepare_data_inference(df_name,vt,hehe):
                 f"{max(row['Source IP'], row['Destination IP'])}-{max(row['Source Port'], row['Destination Port'])}-"
                 f"{row['Protocol']}",
     axis=1).to_list()
-    df = df.drop(columns = ['Source IP', 'Source Port', 'Destination IP', 'Destination Port', "Timestamp"])
-    df = df.drop(columns = ['PSH Flag Count', 'ECE Flag Count', 'RST Flag Count', 'ACK Flag Count', 'Fwd Packet Length Min', 'Bwd Packet Length Min', 'Packet Length Min', 'Protocol', 'Down/Up Ratio','Bwd Bulk Rate Avg', 'Bwd Bytes/Bulk Avg', 'Bwd Packet/Bulk Avg', 'Bwd PSH Flags', 'Bwd URG Flags', 'CWE Flag Count', 'FIN Flag Count', 'Fwd Bulk Rate Avg', 'Fwd Bytes/Bulk Avg', 'Fwd Packet/Bulk Avg', 'Fwd URG Flags'])
+    df = df.drop(columns = ['Source IP', 'Source Port', 'Destination IP', 'Destination Port', "Timestamp","Flow ID","Label"],errors='ignore')
+    df = df.drop(columns = ['PSH Flag Count', 'ECE Flag Count', 'RST Flag Count', 'ACK Flag Count', 'Fwd Packet Length Min', 'Bwd Packet Length Min', 'Packet Length Min', 'Protocol', 'Down/Up Ratio','Bwd Bulk Rate Avg', 'Bwd Bytes/Bulk Avg', 'Bwd Packet/Bulk Avg', 'Bwd PSH Flags', 'Bwd URG Flags', 'CWE Flag Count', 'FIN Flag Count', 'Fwd Bulk Rate Avg', 'Fwd Bytes/Bulk Avg', 'Fwd Packet/Bulk Avg', 'Fwd URG Flags'],errors="ignore")
     df = df.replace([np.inf, -np.inf], 0).fillna(0)
     X = df.to_numpy()
     X = vt.transform(X)
     X = hehe.transform(X)
     return X,idx
+
+def prepare_data_test(df_name,vt,hehe):
+    df = pd.read_csv(df_name)
+    y,df = df["Label"].to_numpy(),df.drop(columns = ["Label"])
+    df = df.drop(columns = ['Source IP', 'Source Port', 'Destination IP', 'Destination Port', "Timestamp","Flow ID","Label"],errors='ignore')
+    df = df.drop(columns = ['PSH Flag Count', 'ECE Flag Count', 'RST Flag Count', 'ACK Flag Count', 'Fwd Packet Length Min', 'Bwd Packet Length Min', 'Packet Length Min', 'Protocol', 'Down/Up Ratio','Bwd Bulk Rate Avg', 'Bwd Bytes/Bulk Avg', 'Bwd Packet/Bulk Avg', 'Bwd PSH Flags', 'Bwd URG Flags', 'CWE Flag Count', 'FIN Flag Count', 'Fwd Bulk Rate Avg', 'Fwd Bytes/Bulk Avg', 'Fwd Packet/Bulk Avg', 'Fwd URG Flags'],errors="ignore")
+    df = df.replace([np.inf, -np.inf], 0).fillna(0)
+    X = df.to_numpy()
+    X = vt.transform(X)
+    X = hehe.transform(X)
+    return X,y

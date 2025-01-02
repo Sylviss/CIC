@@ -22,14 +22,17 @@ with open("models/std.pkl","rb") as f:
 with open("models/discretizer.pkl","rb") as f:
     discretizer = pickle.load(f)
 
-def main(path,model,file_name):
+def main(path,model,file_name,valid_file):
     name = model
-    a = pd.read_csv(path)
+    print("Reading file")
     try:
-        a = a.drop(columns = ['Source IP', 'Source Port', 'Destination IP', 'Destination Port', "Timestamp"])
-        a = a.drop(columns = ['PSH Flag Count', 'ECE Flag Count', 'RST Flag Count', 'ACK Flag Count', 'Fwd Packet Length Min', 'Bwd Packet Length Min', 'Packet Length Min', 'Protocol', 'Down/Up Ratio','Bwd Bulk Rate Avg', 'Bwd Bytes/Bulk Avg', 'Bwd Packet/Bulk Avg', 'Bwd PSH Flags', 'Bwd URG Flags', 'CWE Flag Count', 'FIN Flag Count', 'Fwd Bulk Rate Avg', 'Fwd Bytes/Bulk Avg', 'Fwd Packet/Bulk Avg', 'Fwd URG Flags'])
-    except KeyError:
-        pass
+        a = pd.read_csv(path)
+    except Exception as e:
+        print(e)
+        return
+    print("Complete reading file")
+    a = a.drop(columns = ['Source IP', 'Source Port', 'Destination IP', 'Destination Port', "Timestamp", "Flow ID"], errors='ignore')
+    a = a.drop(columns = ['PSH Flag Count', 'ECE Flag Count', 'RST Flag Count', 'ACK Flag Count', 'Fwd Packet Length Min', 'Bwd Packet Length Min', 'Packet Length Min', 'Protocol', 'Down/Up Ratio','Bwd Bulk Rate Avg', 'Bwd Bytes/Bulk Avg', 'Bwd Packet/Bulk Avg', 'Bwd PSH Flags', 'Bwd URG Flags', 'CWE Flag Count', 'FIN Flag Count', 'Fwd Bulk Rate Avg', 'Fwd Bytes/Bulk Avg', 'Fwd Packet/Bulk Avg', 'Fwd URG Flags'], errors='ignore')
     a = a.replace([np.inf, -np.inf], 0).fillna(0)
     X,y = a.drop(columns = ["Label"]).to_numpy(),a.Label.to_numpy().astype("int32")
     X = vt.transform(X)
@@ -45,7 +48,7 @@ def main(path,model,file_name):
     elif model == "lgbm":
         X = std.transform(X)
         model = LGBMClassifier(verbosity=-1)
-    elif model == "mnb":
+    elif model == "mnb":    
         X = discretizer.transform(X)
         model = MultinomialNB()
     elif model == "mymnb":
@@ -54,23 +57,60 @@ def main(path,model,file_name):
     elif model == "mygnb":
         X = std.transform(X)
         model = MyGNB()
-
-    X_train,X_valid,y_train,y_valid = train_test_split(X,y,test_size=0.2,random_state=RANDOM_STATE)
-        
-    model.fit(X_train,y_train)
-    y_pred = model.predict(X_valid)
-    y_score = model.predict_proba(X_valid)[:,1]
+    else:
+        print("Please choose a correct model")
+        return
+    if valid_file is None:
+        X_train,X_valid,y_train,y_valid = train_test_split(X,y,test_size=0.2,random_state=RANDOM_STATE)
+    else:
+        X_train = X
+        y_train = y
+        print("Reading validation file")
+        try:
+            b = pd.read_csv(valid_file)
+        except Exception as e:
+            print(e)
+            return
+        print("Complete reading validation file")
+        b = b.drop(columns = ['Source IP', 'Source Port', 'Destination IP', 'Destination Port', "Timestamp", "Flow ID"], errors='ignore')
+        b = b.drop(columns = ['PSH Flag Count', 'ECE Flag Count', 'RST Flag Count', 'ACK Flag Count', 'Fwd Packet Length Min', 'Bwd Packet Length Min', 'Packet Length Min', 'Protocol', 'Down/Up Ratio','Bwd Bulk Rate Avg', 'Bwd Bytes/Bulk Avg', 'Bwd Packet/Bulk Avg', 'Bwd PSH Flags', 'Bwd URG Flags', 'CWE Flag Count', 'FIN Flag Count', 'Fwd Bulk Rate Avg', 'Fwd Bytes/Bulk Avg', 'Fwd Packet/Bulk Avg', 'Fwd URG Flags'], errors='ignore')
+        b = b.replace([np.inf, -np.inf], 0).fillna(0)
+        X_valid,y_valid = b.drop(columns = ["Label"]).to_numpy(),b.Label.to_numpy().astype("int32")
+        X_valid = vt.transform(X_valid)
+        if model == "dt":
+            X_valid = std.transform(X_valid)
+        elif model == "gnb":
+            X_valid = std.transform(X_valid)
+        elif model == "lr":
+            X_valid = std.transform(X_valid)
+        elif model == "lgbm":
+            X_valid = std.transform(X_valid)
+        elif model == "mnb":
+            X_valid = discretizer.transform(X_valid)
+        elif model == "mymnb":
+            X_valid = discretizer.transform(X_valid)
+        elif model == "mygnb":
+            X_valid = std.transform(X_valid)
+    try:
+        model.fit(X_train,y_train)
+        y_pred = model.predict(X_valid)
+        y_score = model.predict_proba(X_valid)[:,1]
+    except Exception as e:        
+        print("Data error")
+        print(e)
+        return 
     print_metrics(name,y_valid,y_pred,y_score)
     
-    with open(f"models/{file_name}.pkl","wb") as f:
+    with open(f"trained/{file_name}.pkl","wb") as f:
         pickle.dump(model,f)
     
-    print(f"Model saved at models/{file_name}.pkl")
+    print(f"Model saved at trained/{file_name}.pkl")
     
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("--path",type=str,required=True,help="Path to the dataset")
+    parser.add_argument("--valid_path",type=str,help="Path to the validation dataset",default=None)
     parser.add_argument("--model",type=str,required=True,choices=["dt","gnb","lr","lgbm","mnb","mymnb","mygnb"],help="Model to use")
     parser.add_argument("--file_name",type=str,required=True,help="Name of the file to save the model")
     args = parser.parse_args()
-    main(args.path,args.model,args.file_name)
+    main(args.path,args.model,args.file_name,args.valid_path)
